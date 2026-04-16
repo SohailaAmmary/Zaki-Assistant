@@ -1,0 +1,81 @@
+# ============================================================
+#  Zaki Configuration
+#  Edit this file to customize your setup
+# ============================================================
+
+audio:
+  sample_rate: 16000          # Hz — Whisper & openWakeWord both expect 16kHz
+  channels: 1                 # Mono
+  chunk_size: 1280            # Samples per chunk (~80ms at 16kHz)
+  record_seconds: 5           # Max seconds to record after wake word
+  silence_threshold: 500      # RMS below this = silence (tune to your mic)
+  silence_timeout: 1.5        # Seconds of silence before stopping recording
+  device_index: null          # null = system default mic, or set an integer
+
+wake_word:
+  model: "hey_jarvis"         # openWakeWord built-in model (closest to "Hey Zaki")
+  # To train a custom "Hey Zaki" model, see: https://github.com/dscripka/openWakeWord
+  threshold: 0.5              # Detection sensitivity (0.0–1.0)
+  vad_threshold: 0.0          # Voice activity detection threshold
+
+asr:
+  backend: "faster-whisper"   # Options: "faster-whisper" | "groq" | "google"
+  model_size: "base"          # faster-whisper: tiny|base|small|medium|large-v3
+  language: null              # null = auto-detect Arabic/English
+  device: "cpu"               # "cpu" or "cuda" if you have a GPU
+  compute_type: "int8"        # Quantization: int8 (fast) | float16 | float32
+
+nlu:
+  backend: "rules"            # Options: "rules" | "llm"
+  # If backend = "llm", set your API key in .env as OPENAI_API_KEY or GROQ_API_KEY
+
+tts:
+  backend: "pyttsx3"          # Options: "pyttsx3" (local) | "gtts" (online, better Arabic)
+  rate: 150                   # Words per minute
+  volume: 0.9
+
+mqtt:
+  enabled: false              # Set to true when connecting to ESP32 / Home Assistant
+  broker: "localhost"
+  port: 1883
+  username: ""
+  password: ""
+  topic_prefix: "zaki"        # Commands publish to: zaki/devices/{device_id}/command
+
+devices:
+  # Define your rooms and devices here
+  rooms:
+    room1:
+      name: "Living Room"
+      name_ar: "غرفة المعيشة"
+      aliases: ["living room", "salon", "غرفة المعيشة", "الصالة"]
+      devices:
+        light:
+          id: "room1_light"
+          type: "relay"
+          gpio: 5           # ESP32 GPIO pin (used when running on-device)
+
+    room2:
+      name: "Bedroom"
+      name_ar: "غرفة النوم"
+      aliases: ["bedroom", "غرفة النوم", "الغرفة"]
+      devices:
+        light:
+          id: "room2_light"
+          type: "relay"
+          gpio: 18
+
+    room3:
+      name: "Kitchen"
+      name_ar: "المطبخ"
+      aliases: ["kitchen", "مطبخ", "المطبخ"]
+      devices:
+        light:
+          id: "room3_light"
+          type: "relay"
+          gpio: 19
+
+logging:
+  level: "INFO"               # DEBUG | INFO | WARNING | ERROR
+  file: "logs/zaki.log"
+  rotation: "10 MB"
